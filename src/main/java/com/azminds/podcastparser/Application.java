@@ -10,10 +10,11 @@ import com.icosillion.podengine.models.Podcast;
 import com.opencsv.CSVReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 import java.io.Reader;
 import java.net.URL;
@@ -24,13 +25,16 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
-public class Application {
+public class Application extends SpringBootServletInitializer implements CommandLineRunner {
 
   private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
   }
+
+  @Autowired
+  PodcastRepository podcastRepository;
 
   public static ArrayList<PodcastCSV> readCsv(String SAMPLE_CSV_FILE_PATH) {
     ArrayList<PodcastCSV> podcasts = new ArrayList<>();
@@ -51,48 +55,46 @@ public class Application {
     return podcasts;
   }
 
-  @Bean
-  CommandLineRunner commandLineRunner(PodcastRepository podcastRepository) {
+  @Override
+  public void run(String... args) throws Exception {
+    ArrayList<PodcastCSV> records = readCsv("FileNumber_1.csv");
+    logger.info("{}", records);
+    Partition<PodcastCSV> arrayChunk = Partition.ofSize(records, 25);
+    logger.info("{}", arrayChunk);
     System.out.println("CommandLine Runner!!!");
-    return args -> {
-      ArrayList<PodcastCSV> records = readCsv("FileNumber_1.csv");
-      logger.info("{}", records);
-      Partition<PodcastCSV> arrayChunk = Partition.ofSize(records, 25);
-      logger.info("{}", arrayChunk);
-      System.out.println("CommandLine Runner!!!");
-      arrayChunk.forEach(arr -> {
-        Collection<String> arrIds = arr.stream().map(item -> item.getItunesId()).collect(Collectors.toList());
-        Response response = new Lookup()
-            .setIds(arrIds)
-            .setEntity(Entity.PODCAST)
-            .execute();
+    arrayChunk.forEach(arr -> {
+      Collection<String> arrIds = arr.stream().map(item -> item.getItunesId()).collect(Collectors.toList());
+      Response response = new Lookup()
+          .setIds(arrIds)
+          .setEntity(Entity.PODCAST)
+          .execute();
 
-        Collection<Result> results = response.getResults();
-        results.forEach(rslt -> {
-          System.out.println(rslt);
-          com.azminds.podcastparser.domain.Podcast podcastEntity = new com.azminds.podcastparser.domain.Podcast(
-              rslt.getCollectionId(),
-              rslt.getCollectionName(),
-              rslt.getDescription(),
-              rslt.getCollectionViewUrl(),
-              rslt.getArtistName(),
-              rslt.getArtistViewUrl(),
-              rslt.getWrapperType(),
-              rslt.getKind(),
-              rslt.getFeedUrl(),
-              rslt.getPreviewUrl(),
-              rslt.getArtworkUrl30(),
-              rslt.getArtworkUrl60(),
-              rslt.getArtworkUrl100(),
-              rslt.getArtworkUrl512(),
-              rslt.getArtworkUrl600(),
-              rslt.getReleaseDate(),
-              rslt.getTrackCount(),
-              rslt.getCountry(),
-              rslt.getCopyright(),
-              rslt.getShortDescription(),
-              rslt.getLongDescription()
-          );
+      Collection<Result> results = response.getResults();
+      results.forEach(rslt -> {
+        System.out.println(rslt);
+        com.azminds.podcastparser.domain.Podcast podcastEntity = new com.azminds.podcastparser.domain.Podcast(
+            rslt.getCollectionId(),
+            rslt.getCollectionName(),
+            rslt.getDescription(),
+            rslt.getCollectionViewUrl(),
+            rslt.getArtistName(),
+            rslt.getArtistViewUrl(),
+            rslt.getWrapperType(),
+            rslt.getKind(),
+            rslt.getFeedUrl(),
+            rslt.getPreviewUrl(),
+            rslt.getArtworkUrl30(),
+            rslt.getArtworkUrl60(),
+            rslt.getArtworkUrl100(),
+            rslt.getArtworkUrl512(),
+            rslt.getArtworkUrl600(),
+            rslt.getReleaseDate(),
+            rslt.getTrackCount(),
+            rslt.getCountry(),
+            rslt.getCopyright(),
+            rslt.getShortDescription(),
+            rslt.getLongDescription()
+        );
 
 //          GenreData[] genreData = new GenreData[rslt.getGenreIds().size()];
 //          int i = 0;
@@ -108,33 +110,32 @@ public class Application {
 //            i++;
 //          }
 
-          try {
-            Podcast podcastData = new Podcast(new URL(rslt.getFeedUrl()));
-            System.out.println("- " + podcastData.getTitle() + " " + podcastData.getEpisodes().size());
-            podcastEntity.setDescription(podcastData.getDescription());
-            podcastEntity.setEpisodeCount(podcastData.getEpisodes().size());
+        try {
+          Podcast podcastData = new Podcast(new URL(rslt.getFeedUrl()));
+          System.out.println("- " + podcastData.getTitle() + " " + podcastData.getEpisodes().size());
+          podcastEntity.setDescription(podcastData.getDescription());
+          podcastEntity.setEpisodeCount(podcastData.getEpisodes().size());
 
-            Collection<Episode> episodes = podcastData.getEpisodes();
-            // List all episodes
-            for (Episode episode : episodes) {
-              com.azminds.podcastparser.domain.Episode episodeEntity = new com.azminds.podcastparser.domain.Episode(
-                  episode.getTitle(),
-                  episode.getDescription(),
-                  episode.getGUID(),
-                  episode.getLink(),
-                  episode.getPubDate(),
-                  episode.getITunesInfo().getDuration()
-              );
-              podcastEntity.addEpisode(episodeEntity);
-            }
-          } catch (Exception e) {
-            System.out.println("Exception::");
-            System.out.println(e);
+          Collection<Episode> episodes = podcastData.getEpisodes();
+          // List all episodes
+          for (Episode episode : episodes) {
+            com.azminds.podcastparser.domain.Episode episodeEntity = new com.azminds.podcastparser.domain.Episode(
+                episode.getTitle(),
+                episode.getDescription(),
+                episode.getGUID(),
+                episode.getLink(),
+                episode.getPubDate(),
+                episode.getITunesInfo().getDuration()
+            );
+            podcastEntity.addEpisode(episodeEntity);
           }
+        } catch (Exception e) {
+          System.out.println("Exception::");
+          System.out.println(e);
+        }
 
-          podcastRepository.save(podcastEntity);
-        });
+        podcastRepository.save(podcastEntity);
       });
-    };
+    });
   }
 }
