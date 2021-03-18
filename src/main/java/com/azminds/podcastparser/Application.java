@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -63,7 +64,10 @@ public class Application extends SpringBootServletInitializer implements Command
   public void run(String... args) {
 //    for (int i = 1; i <= 20; i++) {
 //    parse("FileNumber_" + i + ".csv");
-    ArrayList<PodcastCSV> records = readCsv("FileNumber_1.csv");
+    Path root = Paths.get(System.getProperty("user.dir")).getFileSystem()
+        .getRootDirectories().iterator().next();
+
+    ArrayList<PodcastCSV> records = readCsv(root + "FileNumber_1.csv");
     logger.info("{}", records);
     Partition<PodcastCSV> arrayChunk = Partition.ofSize(records, 25);
     logger.info("{}", arrayChunk);
