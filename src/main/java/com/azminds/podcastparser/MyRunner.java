@@ -89,7 +89,6 @@ public class MyRunner implements CommandLineRunner {
         podcastEntity.setDescription(rslt.getDescription());
         podcastEntity.setTrackCount(rslt.getTrackCount());
         podcastEntity.setCopyright(rslt.getCopyright());
-        podcastRepository.save(podcastEntity);
 
         GenreData[] genreData = new GenreData[rslt.getGenreIds().size()];
         int i = 0;
@@ -106,8 +105,6 @@ public class MyRunner implements CommandLineRunner {
         }
 
         try {
-          // Download and parse the Cortex RSS feed
-//          Podcast podcast = new Podcast(new URL("https://www.relay.fm/cortex/feed"));
           Podcast podcastData = new Podcast(new URL(rslt.getFeedUrl()));
           System.out.println("- " + podcastData.getTitle() + " " + podcastData.getEpisodes().size());
           podcastEntity.setDescription(podcastData.getDescription());
@@ -121,12 +118,14 @@ public class MyRunner implements CommandLineRunner {
             episodeEntity.setDescription(episode.getDescription());
             episodeEntity.setGuid(episode.getGUID());
             episodeEntity.setLink(episode.getLink());
-            episodeRepository.save(episodeEntity);
+            podcastEntity.addEpisode(episodeEntity);
           }
         } catch (Exception e) {
           System.out.println("Exception::");
           System.out.println(e);
         }
+
+        podcastRepository.save(podcastEntity);
       });
     });
   }

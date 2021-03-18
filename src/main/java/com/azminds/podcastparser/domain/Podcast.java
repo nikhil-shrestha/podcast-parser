@@ -116,6 +116,12 @@ public class Podcast implements Serializable {
   )
   private Set<Genre> genres;
 
+  @OneToMany(
+      cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+      mappedBy = "podcast"
+  )
+  private List<Episode> episodes = new ArrayList<>();
+
   public Podcast() {
   }
 
@@ -378,6 +384,21 @@ public class Podcast implements Serializable {
     genres.remove(genre);
     genre.getPodcasts().remove(this);
   }
+
+  public List<Episode> getEpisodes() {
+    return episodes;
+  }
+
+  public void addEpisode(Episode episode) {
+    if (!episodes.contains(episode)) {
+      episodes.add(episode);
+    }
+  }
+
+  public void removeEpisode(Episode episode) {
+    episodes.remove(episode);
+  }
+
 
   @Override
   public String toString() {

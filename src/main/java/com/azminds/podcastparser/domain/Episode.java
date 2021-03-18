@@ -12,7 +12,6 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Table(name = "episode")
 public class Episode implements Serializable {
 
-
   @Id
   @SequenceGenerator(
       name = "episode_sequence",
@@ -66,8 +65,16 @@ public class Episode implements Serializable {
   @Column(name = "duration")
   private String duration;
 
-  @Column(name = "podcast_id")
-  private Long podcastId;
+  @ManyToOne
+  @JoinColumn(
+      name = "podcast_id",
+      nullable = false,
+      referencedColumnName = "id",
+      foreignKey = @ForeignKey(
+          name = "podcast_episode_fk"
+      )
+  )
+  private Podcast podcast;
 
   public Episode(String title,
                  String description,
