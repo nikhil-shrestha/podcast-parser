@@ -62,9 +62,11 @@ public class Application extends SpringBootServletInitializer implements Command
 
   @Override
   public void run(String... args) {
+
+    CsvSplit.splitFile();
+
 //    for (int i = 1; i <= 20; i++) {
 //    parse("FileNumber_" + i + ".csv");
-
     ArrayList<PodcastCSV> records = readCsv("/home/ec2-user/FileNumber_1.csv");
     logger.info("{}", records);
     Partition<PodcastCSV> arrayChunk = Partition.ofSize(records, 25);

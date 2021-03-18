@@ -8,9 +8,10 @@ import java.util.Scanner;
  * CSV Split by lines
  */
 public class CsvSplit {
-  public static void splitLargeFile(final String fileName,
-                                    final String extension,
-                                    final int maxLines) {
+  public static void splitLargeFile(
+      final String fileName,
+      final String extension,
+      final int maxLines) {
 
     try (Scanner s = new Scanner(new FileReader(String.format("%s.%s", fileName, extension)))) {
       int file = 0;
@@ -39,7 +40,7 @@ public class CsvSplit {
     // BufferedReader br = new BufferedReader(new FileReader(path.getFile())); //reader for input file intitialized only once
     String strLine = null;
     for (int i = 1; i <= files; i++) {
-      FileWriter fstream1 = new FileWriter("FileNumber_" + i + ".csv"); //creating a new file writer.
+      FileWriter fstream1 = new FileWriter("/home/ec2-user/FileNumber_" + i + ".csv"); //creating a new file writer.
       BufferedWriter out = new BufferedWriter(fstream1);
       for (int j = 0; j < lines; j++) {   //iterating the reader to read only the first few lines of the csv as defined earlier
         strLine = br.readLine();
@@ -55,11 +56,11 @@ public class CsvSplit {
     }
   }
 
-  public static void main(String args[]) {
+  public static void splitFile() {
     try {
-      int lines = 10;  //set this to whatever number of lines you need in each file
+      int lines = 100;  //set this to whatever number of lines you need in each file
       int count = 0;
-      String inputfile = "file.csv";
+      String inputfile = "/home/ec2-user/file.csv";
       File file = new File(inputfile);
       Scanner scanner = new Scanner(file);
       while (scanner.hasNextLine()) {  //counting the lines in the input file
@@ -76,8 +77,6 @@ public class CsvSplit {
       System.out.println(files); //number of files that shall eb created
 
       myFunction(lines, files);
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
     }
