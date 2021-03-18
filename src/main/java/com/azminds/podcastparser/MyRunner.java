@@ -30,8 +30,6 @@ public class MyRunner implements CommandLineRunner {
 
   @Autowired
   private PodcastRepository podcastRepository;
-  @Autowired
-  private EpisodeRepository episodeRepository;
 
   public static ArrayList<PodcastCSV> readCsv(String SAMPLE_CSV_FILE_PATH) {
     ArrayList<PodcastCSV> podcasts = new ArrayList<>();
