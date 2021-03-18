@@ -8,6 +8,7 @@ import com.azminds.podcastparser.repository.PodcastRepository;
 import com.icosillion.podengine.models.Episode;
 import com.icosillion.podengine.models.Podcast;
 import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.net.URL;
 import java.nio.file.Files;
@@ -49,14 +51,18 @@ public class Application extends SpringBootServletInitializer implements Command
         PodcastCSV podcast = new PodcastCSV(nextRecord[0], nextRecord[1], nextRecord[2], nextRecord[3], nextRecord[4], nextRecord[5], nextRecord[6]);
         podcasts.add(podcast);
       }
-    } catch (Exception e) {
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (CsvValidationException e) {
       e.printStackTrace();
     }
     return podcasts;
   }
 
   @Override
-  public void run(String... args) throws Exception {
+  public void run(String... args) {
+//    for (int i = 1; i <= 20; i++) {
+//    parse("FileNumber_" + i + ".csv");
     ArrayList<PodcastCSV> records = readCsv("FileNumber_1.csv");
     logger.info("{}", records);
     Partition<PodcastCSV> arrayChunk = Partition.ofSize(records, 25);
@@ -131,11 +137,12 @@ public class Application extends SpringBootServletInitializer implements Command
           }
         } catch (Exception e) {
           System.out.println("Exception::");
-          System.out.println(e);
+          e.printStackTrace();
         }
 
         podcastRepository.save(podcastEntity);
       });
     });
+//  }
   }
 }
