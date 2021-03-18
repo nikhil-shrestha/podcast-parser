@@ -30,13 +30,15 @@ public class Episode implements Serializable {
 
   @Column(
       name = "title",
-      nullable = false
+      nullable = false,
+      columnDefinition = "TEXT"
   )
   private String title;
 
   @Column(
       name = "description",
-      nullable = false
+      nullable = false,
+      columnDefinition = "TEXT"
   )
   private String description;
 
@@ -79,16 +81,14 @@ public class Episode implements Serializable {
   public Episode(String title,
                  String description,
                  String guid,
-                 String link,
+                 URL link,
                  Date pubDate,
-                 String episodeNumber,
                  String duration) {
     this.title = title;
     this.description = description;
     this.guid = guid;
-    this.link = link;
+    this.link = link.toString();
     this.pubDate = pubDate;
-    this.episodeNumber = episodeNumber;
     this.duration = duration;
   }
 
@@ -143,6 +143,9 @@ public class Episode implements Serializable {
     this.pubDate = pubDate;
   }
 
+  public void setPodcast(Podcast podcast) {
+    this.podcast = podcast;
+  }
 
   @Override
   public String toString() {
