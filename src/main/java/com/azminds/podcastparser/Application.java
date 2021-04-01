@@ -175,7 +175,7 @@ public class Application extends SpringBootServletInitializer implements Command
 //    CsvSplit.splitFile();
 
     for (int i = 1; i <= 10; i++) {
-      ArrayList<PodcastCSV> records = readCsv("FileNumber_" + i + ".csv");
+      ArrayList<PodcastCSV> records = readCsv("/home/ec2-user/FileNumber_" + i + ".csv");
       logger.info("{}", records);
       Partition<PodcastCSV> arrayChunk = Partition.ofSize(records, 100);
       logger.info("{}", arrayChunk);
