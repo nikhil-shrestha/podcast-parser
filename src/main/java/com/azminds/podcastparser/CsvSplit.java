@@ -58,7 +58,7 @@ public class CsvSplit {
 
   public static void splitFile() {
     try {
-      int lines = 100;  //set this to whatever number of lines you need in each file
+      int lines = 1000;  //set this to whatever number of lines you need in each file
       int count = 0;
       String inputfile = "/home/ec2-user/file.csv";
       File file = new File(inputfile);
