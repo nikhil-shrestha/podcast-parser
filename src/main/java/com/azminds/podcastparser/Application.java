@@ -138,7 +138,10 @@ public class Application extends SpringBootServletInitializer implements Command
                 episode.getGUID(),
                 episode.getLink(),
                 episode.getPubDate(),
-                episode.getITunesInfo().getDuration()
+                episode.getITunesInfo().getDuration(),
+                episode.getEnclosure().getURL(),
+                episode.getEnclosure().getLength(),
+                episode.getEnclosure().getType()
             );
             podcastEntity.addEpisode(episodeEntity);
           }
