@@ -48,11 +48,8 @@ public class Episode implements Serializable {
   )
   private String guid;
 
-  @Column(
-      name = "link",
-      nullable = false
-  )
-  private String link;
+  @Column(name = "hosted_url")
+  private String hostedUrl;
 
   @Column(
       name = "pub_date",
@@ -64,8 +61,22 @@ public class Episode implements Serializable {
   @Column(name = "episode_number")
   private String episodeNumber;
 
+  @Column(name = "duration_string")
+  private String durationString;
+
   @Column(name = "duration")
-  private String duration;
+  private Long duration;
+
+  @Column(
+      name = "link",
+      nullable = false
+  )
+  private String link;
+
+
+  @Column(name = "type")
+  private String type;
+
 
   @ManyToOne
   @JoinColumn(
@@ -81,15 +92,22 @@ public class Episode implements Serializable {
   public Episode(String title,
                  String description,
                  String guid,
-                 URL link,
+                 URL hostedUrl,
                  Date pubDate,
-                 String duration) {
+                 String durationString,
+                 URL link,
+                 Long duration,
+                 String type
+                 ) {
     this.title = title;
     this.description = description;
     this.guid = guid;
-    this.link = link.toString();
+    this.hostedUrl = hostedUrl.toString();
     this.pubDate = pubDate;
+    this.durationString = durationString;
+    this.link = link.toString();
     this.duration = duration;
+    this.type = type;
   }
 
   public Episode() {
@@ -141,6 +159,54 @@ public class Episode implements Serializable {
 
   public void setPubDate(Date pubDate) {
     this.pubDate = pubDate;
+  }
+
+  public void setLink(String link) {
+    this.link = link;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public String getHostedUrl() {
+    return hostedUrl;
+  }
+
+  public void setHostedUrl(String hostedUrl) {
+    this.hostedUrl = hostedUrl;
+  }
+
+  public String getEpisodeNumber() {
+    return episodeNumber;
+  }
+
+  public void setEpisodeNumber(String episodeNumber) {
+    this.episodeNumber = episodeNumber;
+  }
+
+  public Long getDuration() {
+    return duration;
+  }
+
+  public void setDuration(Long duration) {
+    this.duration = duration;
+  }
+
+  public String getDurationString() {
+    return durationString;
+  }
+
+  public void setDurationString(String durationString) {
+    this.durationString = durationString;
+  }
+
+  public Podcast getPodcast() {
+    return podcast;
   }
 
   public void setPodcast(Podcast podcast) {
