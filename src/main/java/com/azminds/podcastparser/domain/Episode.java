@@ -3,7 +3,6 @@ package com.azminds.podcastparser.domain;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.net.URL;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 import static javax.persistence.GenerationType.SEQUENCE;
@@ -82,10 +81,7 @@ public class Episode implements Serializable {
   @JoinColumn(
       name = "podcast_id",
       nullable = false,
-      referencedColumnName = "id",
-      foreignKey = @ForeignKey(
-          name = "podcast_episode_fk"
-      )
+      referencedColumnName = "id"
   )
   private Podcast podcast;
 

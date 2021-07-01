@@ -10,17 +10,17 @@ public class Podcast implements Serializable {
 
   @Id
   @SequenceGenerator(
-      name = "podcast_sequence",
-      sequenceName = "podcast_sequence",
-      allocationSize = 1
+    name = "podcast_sequence",
+    sequenceName = "podcast_sequence",
+    allocationSize = 1
   )
   @GeneratedValue(
-      strategy = GenerationType.SEQUENCE,
-      generator = "podcast_sequence"
+    strategy = GenerationType.SEQUENCE,
+    generator = "podcast_sequence"
   )
   @Column(
-      name = "id",
-      updatable = false
+    name = "id",
+    updatable = false
   )
   private Long id;
 
@@ -31,8 +31,8 @@ public class Podcast implements Serializable {
   private String kind;
 
   @Column(
-      name = "collection_id",
-      nullable = false
+    name = "collection_id",
+    nullable = false
   )
   private Long collectionId;
 
@@ -40,8 +40,8 @@ public class Podcast implements Serializable {
   private String artistName;
 
   @Column(
-      name = "collection_name",
-      nullable = false
+    name = "collection_name",
+    nullable = false
   )
   private String collectionName;
 
@@ -87,12 +87,13 @@ public class Podcast implements Serializable {
   @Column(name = "short_description")
   private String shortDescription;
 
-  @Column(name = "long_description")
+  @Column(name = "long_description", length = 1024)
   private String longDescription;
 
   @Column(
-      name = "description",
-      columnDefinition = "TEXT"
+    name = "description",
+    columnDefinition = "TEXT",
+    length = 500
   )
   private String description;
 
@@ -102,23 +103,20 @@ public class Podcast implements Serializable {
   @Column(name = "episode_count")
   private Integer episodeCount;
 
-  @ManyToMany
-  @JoinTable(
-      name = "podcast_genre",
-      joinColumns = @JoinColumn(
-          name = "podcast_id",
-          foreignKey = @ForeignKey(name = "podcast_id_fk")
-      ),
-      inverseJoinColumns = @JoinColumn(
-          name = "genre_id",
-          foreignKey = @ForeignKey(name = "genre_id_fk")
-      )
+  @ManyToMany(
+    fetch = FetchType.LAZY,
+    cascade = {CascadeType.MERGE}
   )
-  private Set<Genre> genres;
+  @JoinTable(
+    name = "podcast_genre",
+    joinColumns = @JoinColumn(name = "podcast_id"),
+    inverseJoinColumns = @JoinColumn(name = "genre_id")
+  )
+  private Set<Genre> genres = new HashSet<>();
 
   @OneToMany(
-      cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
-      mappedBy = "podcast"
+    cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+    mappedBy = "podcast"
   )
   private List<Episode> episodes = new ArrayList<>();
 
@@ -126,27 +124,27 @@ public class Podcast implements Serializable {
   }
 
   public Podcast(
-      Long collectionId,
-      String collectionName,
-      String description,
-      String collectionViewUrl,
-      String artistName,
-      String artistViewUrl,
-      String wrapperType,
-      String kind,
-      String feedUrl,
-      String previewUrl,
-      String artworkUrl30,
-      String artworkUrl60,
-      String artworkUrl100,
-      String artworkUrl512,
-      String artworkUrl600,
-      String releaseDate,
-      Integer trackCount,
-      String country,
-      String copyright,
-      String shortDescription,
-      String longDescription) {
+    Long collectionId,
+    String collectionName,
+    String description,
+    String collectionViewUrl,
+    String artistName,
+    String artistViewUrl,
+    String wrapperType,
+    String kind,
+    String feedUrl,
+    String previewUrl,
+    String artworkUrl30,
+    String artworkUrl60,
+    String artworkUrl100,
+    String artworkUrl512,
+    String artworkUrl600,
+    String releaseDate,
+    Integer trackCount,
+    String country,
+    String copyright,
+    String shortDescription,
+    String longDescription) {
     this.wrapperType = wrapperType;
     this.kind = kind;
     this.collectionId = collectionId;
@@ -259,13 +257,7 @@ public class Podcast implements Serializable {
   }
 
   public void addGenre(Genre genre) {
-    genres.add(genre);
-    genre.getPodcasts().add(this);
-  }
-
-  public void removeGenre(Genre genre) {
-    genres.remove(genre);
-    genre.getPodcasts().remove(this);
+    this.genres.add(genre);
   }
 
   public void addEpisode(Episode episode) {
@@ -290,29 +282,29 @@ public class Podcast implements Serializable {
   @Override
   public String toString() {
     return "Podcast{" +
-        "id=" + id +
-        ", wrapperType='" + wrapperType + '\'' +
-        ", kind='" + kind + '\'' +
-        ", collectionId=" + collectionId +
-        ", artistName='" + artistName + '\'' +
-        ", collectionName='" + collectionName + '\'' +
-        ", artistViewUrl='" + artistViewUrl + '\'' +
-        ", collectionViewUrl='" + collectionViewUrl + '\'' +
-        ", feedUrl='" + feedUrl + '\'' +
-        ", previewUrl='" + previewUrl + '\'' +
-        ", artworkUrl30='" + artworkUrl30 + '\'' +
-        ", artworkUrl60='" + artworkUrl60 + '\'' +
-        ", artworkUrl100='" + artworkUrl100 + '\'' +
-        ", artworkUrl512='" + artworkUrl512 + '\'' +
-        ", artworkUrl600='" + artworkUrl600 + '\'' +
-        ", releaseDate='" + releaseDate + '\'' +
-        ", trackCount=" + trackCount +
-        ", copyright='" + copyright + '\'' +
-        ", country='" + country + '\'' +
-        ", shortDescription='" + shortDescription + '\'' +
-        ", longDescription='" + longDescription + '\'' +
-        ", description='" + description + '\'' +
-        ", currentVersionReleaseDate='" + currentVersionReleaseDate + '\'' +
-        '}';
+      "id=" + id +
+      ", wrapperType='" + wrapperType + '\'' +
+      ", kind='" + kind + '\'' +
+      ", collectionId=" + collectionId +
+      ", artistName='" + artistName + '\'' +
+      ", collectionName='" + collectionName + '\'' +
+      ", artistViewUrl='" + artistViewUrl + '\'' +
+      ", collectionViewUrl='" + collectionViewUrl + '\'' +
+      ", feedUrl='" + feedUrl + '\'' +
+      ", previewUrl='" + previewUrl + '\'' +
+      ", artworkUrl30='" + artworkUrl30 + '\'' +
+      ", artworkUrl60='" + artworkUrl60 + '\'' +
+      ", artworkUrl100='" + artworkUrl100 + '\'' +
+      ", artworkUrl512='" + artworkUrl512 + '\'' +
+      ", artworkUrl600='" + artworkUrl600 + '\'' +
+      ", releaseDate='" + releaseDate + '\'' +
+      ", trackCount=" + trackCount +
+      ", copyright='" + copyright + '\'' +
+      ", country='" + country + '\'' +
+      ", shortDescription='" + shortDescription + '\'' +
+      ", longDescription='" + longDescription + '\'' +
+      ", description='" + description + '\'' +
+      ", currentVersionReleaseDate='" + currentVersionReleaseDate + '\'' +
+      '}';
   }
 }

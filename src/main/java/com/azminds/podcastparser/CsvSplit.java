@@ -40,7 +40,7 @@ public class CsvSplit {
     // BufferedReader br = new BufferedReader(new FileReader(path.getFile())); //reader for input file intitialized only once
     String strLine = null;
     for (int i = 1; i <= files; i++) {
-      FileWriter fstream1 = new FileWriter("/home/ec2-user/FileNumber_" + i + ".csv"); //creating a new file writer.
+      FileWriter fstream1 = new FileWriter("FileNumber_" + i + ".csv"); //creating a new file writer.
       BufferedWriter out = new BufferedWriter(fstream1);
       for (int j = 0; j < lines; j++) {   //iterating the reader to read only the first few lines of the csv as defined earlier
         strLine = br.readLine();
@@ -58,9 +58,9 @@ public class CsvSplit {
 
   public static void splitFile() {
     try {
-      int lines = 1000;  //set this to whatever number of lines you need in each file
+      int lines = 100;  //set this to whatever number of lines you need in each file
       int count = 0;
-      String inputfile = "/home/ec2-user/file.csv";
+      String inputfile = "file.csv";
       File file = new File(inputfile);
       Scanner scanner = new Scanner(file);
       while (scanner.hasNextLine()) {  //counting the lines in the input file
