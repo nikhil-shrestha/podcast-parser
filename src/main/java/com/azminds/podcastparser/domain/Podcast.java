@@ -84,10 +84,17 @@ public class Podcast implements Serializable {
   @Column(name = "country")
   private String country;
 
-  @Column(name = "short_description")
+  @Column(
+    name = "short_description",
+    columnDefinition = "TEXT"
+  )
   private String shortDescription;
 
-  @Column(name = "long_description", length = 1024)
+  @Column(
+    name = "long_description",
+    columnDefinition = "TEXT",
+    length = 1024
+  )
   private String longDescription;
 
   @Column(

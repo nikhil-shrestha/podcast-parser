@@ -6,8 +6,6 @@ import be.ceau.itunesapi.response.Response;
 import be.ceau.itunesapi.response.Result;
 import com.azminds.podcastparser.repository.GenreRepository;
 import com.azminds.podcastparser.repository.PodcastRepository;
-import com.icosillion.podengine.models.Episode;
-import com.icosillion.podengine.models.Podcast;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import org.slf4j.Logger;
@@ -27,6 +25,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
@@ -87,108 +86,24 @@ public class Application extends SpringBootServletInitializer implements Command
       .execute();
 
     Collection<Result> results = response.getResults();
+    int len = results.size();
+    System.out.println("Count " + len);
+    AtomicInteger idx = new AtomicInteger(0);
     results.forEach(rslt -> {
-      System.out.println(rslt);
-      Optional<com.azminds.podcastparser.domain.Podcast> podcastDbData = this.podcastRepository.findByCollectionId(rslt.getCollectionId());
+      System.out.println(rslt.toString());
+      if (isUrlValid(rslt.getFeedUrl())) {
+        Optional<com.azminds.podcastparser.domain.Podcast> podcastDbData = this.podcastRepository.findByCollectionId(rslt.getCollectionId());
 
-      if (!podcastDbData.isPresent()) {
-        com.azminds.podcastparser.domain.Podcast podcastEntity = new com.azminds.podcastparser.domain.Podcast(
-          rslt.getCollectionId(),
-          rslt.getCollectionName(),
-          rslt.getDescription(),
-          rslt.getCollectionViewUrl(),
-          rslt.getArtistName(),
-          rslt.getArtistViewUrl(),
-          rslt.getWrapperType(),
-          rslt.getKind(),
-          rslt.getFeedUrl(),
-          rslt.getPreviewUrl(),
-          rslt.getArtworkUrl30(),
-          rslt.getArtworkUrl60(),
-          rslt.getArtworkUrl100(),
-          rslt.getArtworkUrl512(),
-          rslt.getArtworkUrl600(),
-          rslt.getReleaseDate(),
-          rslt.getTrackCount(),
-          rslt.getCountry(),
-          rslt.getCopyright(),
-          rslt.getShortDescription(),
-          rslt.getLongDescription()
-        );
-        GenreData[] genreData = new GenreData[rslt.getGenreIds().size()];
-        int i = 0;
-        for (String id : rslt.getGenreIds()) {
-          genreData[i] = new GenreData();
-          genreData[i].genreId = id;
-          i++;
+        if (!podcastDbData.isPresent()) {
+          Thread object = new Thread(new PodcastThread(rslt));
+          object.start();
         }
-
-        i = 0;
-        for (String name : rslt.getGenres()) {
-          genreData[i].genreName = name;
-          i++;
-        }
-
-        for (GenreData genre : genreData) {
-          Optional<com.azminds.podcastparser.domain.Genre> genreDbData = this.genreRepository.findByGenreIdOld(genre.genreId);
-          com.azminds.podcastparser.domain.Genre genreEntity;
-
-          if (!genreDbData.isPresent()){
-            genreEntity = new com.azminds.podcastparser.domain.Genre(genre.genreName, genre.genreId);
-            this.genreRepository.save(genreEntity);
-
-            podcastEntity.addGenre(genreEntity);
-          } else {
-            genreEntity = genreDbData.get();
-          }
-          podcastEntity.addGenre(genreEntity);
-
-          System.out.println("added Genre!!!!");
-        }
-
-        System.out.println("URL::" + rslt.getFeedUrl());
-        if (isUrlValid(rslt.getFeedUrl())) {
-          System.out.println("isValid URL>>>");
-          try {
-            Podcast podcastData = new Podcast(new URL(rslt.getFeedUrl()));
-            System.out.println("- " + podcastData.getTitle() + " " + podcastData.getEpisodes().size());
-            podcastEntity.setDescription(podcastData.getDescription());
-            podcastEntity.setEpisodeCount(podcastData.getEpisodes().size());
-
-            System.out.println("get Episode Collection>>>");
-            Collection<Episode> episodes = podcastData.getEpisodes();
-            // List all episodes
-            for (Episode episode : episodes) {
-              com.azminds.podcastparser.domain.Episode episodeEntity = new com.azminds.podcastparser.domain.Episode(
-                episode.getTitle(),
-                episode.getDescription(),
-                episode.getGUID(),
-                episode.getLink(),
-                episode.getPubDate(),
-                episode.getITunesInfo().getDuration(),
-                episode.getEnclosure().getURL(),
-                episode.getEnclosure().getLength(),
-                episode.getEnclosure().getType()
-              );
-              podcastEntity.addEpisode(episodeEntity);
-            }
-          } catch (Exception e) {
-            System.out.println("[Episode] Exception::");
-            e.printStackTrace();
-          }
-        } else {
-          System.out.println("Enter valid URL");
-        }
-        System.out.println("before save!!!!");
-        this.podcastRepository.save(podcastEntity);
+        idx.getAndIncrement();
       }
     });
+    System.out.println("Total Item Saved::" + (len - idx.get()));
   }
 
-  class GenreData {
-    String genreId;
-    String genreName;
-  }
 
   public void savePodcastIndex(Collection<String> arrIds) throws Exception {
     arrIds.forEach(itunesId -> {

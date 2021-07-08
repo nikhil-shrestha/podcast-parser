@@ -36,7 +36,6 @@ public class Episode implements Serializable {
 
   @Column(
       name = "description",
-      nullable = false,
       columnDefinition = "TEXT"
   )
   private String description;
