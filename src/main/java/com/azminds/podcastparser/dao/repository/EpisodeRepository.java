@@ -1,6 +1,6 @@
-package com.azminds.podcastparser.repository;
+package com.azminds.podcastparser.dao.repository;
 
-import com.azminds.podcastparser.domain.Episode;
+import com.azminds.podcastparser.dao.entity.Episode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
