@@ -21,9 +21,9 @@ public class PodcastThread implements Runnable {
   private final AtomicBoolean running = new AtomicBoolean(false);
 
   @Autowired
-  PodcastRepository podcastRepository;
+  private PodcastRepository podcastRepository;
   @Autowired
-  GenreRepository genreRepository;
+  private GenreRepository genreRepository;
 
   PodcastThread(Result rslt) {
     this.rslt = rslt;
@@ -55,7 +55,7 @@ public class PodcastThread implements Runnable {
 
   public void process() {
     try {
-      Optional<com.azminds.podcastparser.dao.entity.Podcast> podcastDbData = this.podcastRepository.findByCollectionId(rslt.getCollectionId());
+      Optional<com.azminds.podcastparser.dao.entity.Podcast> podcastDbData = podcastRepository.findByCollectionId(rslt.getCollectionId());
       if (!podcastDbData.isPresent()) {
         com.azminds.podcastparser.dao.entity.Podcast podcastEntity = new com.azminds.podcastparser.dao.entity.Podcast();
         podcastEntity.setCollectionId(rslt.getCollectionId());
@@ -83,7 +83,7 @@ public class PodcastThread implements Runnable {
 
         for (String id : rslt.getGenreIds()) {
           if (!id.equals("26")){
-            Optional<Genre> genreDbData = this.genreRepository.findByGenreIdOld(id);
+            Optional<Genre> genreDbData = genreRepository.findByGenreIdOld(id);
             if (genreDbData.isPresent()){
               Genre genreEntity = genreDbData.get();
               podcastEntity.addGenre(genreEntity);
@@ -137,7 +137,7 @@ public class PodcastThread implements Runnable {
           e.printStackTrace();
         }
         System.out.println("before save!!!!");
-        this.podcastRepository.save(podcastEntity);
+        podcastRepository.save(podcastEntity);
       }
 
       System.out.println("Thread Terminated!!");
