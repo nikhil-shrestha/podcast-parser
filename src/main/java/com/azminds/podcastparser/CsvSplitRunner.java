@@ -1,17 +1,19 @@
 package com.azminds.podcastparser;
 
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
 import java.io.*;
-import java.io.IOException;
 import java.util.Scanner;
 
-/**
- * CSV Split by lines
- */
-public class CsvSplit {
+@Component
+@Order(value = 1)
+public class CsvSplitRunner implements CommandLineRunner {
   public static void splitLargeFile(
-      final String fileName,
-      final String extension,
-      final int maxLines) {
+    final String fileName,
+    final String extension,
+    final int maxLines) {
 
     try (Scanner s = new Scanner(new FileReader(String.format("%s.%s", fileName, extension)))) {
       int file = 0;
@@ -32,7 +34,7 @@ public class CsvSplit {
     }
   }
 
-  public static void myFunction(int lines, int files) throws FileNotFoundException, IOException {
+  public void myFunction(int lines, int files) throws FileNotFoundException, IOException {
     String inputfile = "file.csv";
     BufferedReader br = new BufferedReader(new FileReader(inputfile)); //reader for input file intitialized only once
 
@@ -56,7 +58,8 @@ public class CsvSplit {
     }
   }
 
-  public static void splitFile() {
+  @Override
+  public void run(String... args) {
     try {
       int lines = 1000;  //set this to whatever number of lines you need in each file
       int count = 0;

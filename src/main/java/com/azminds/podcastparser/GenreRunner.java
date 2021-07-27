@@ -17,7 +17,7 @@ import java.net.URL;
 import java.util.List;
 
 @Component
-@Order(value = 1)
+@Order(value = 2)
 public class GenreRunner implements CommandLineRunner {
 
   private static final String API_ENDPOINT = "https://3rugykz490.execute-api.us-west-1.amazonaws.com/dev/apple/podcast/genre";

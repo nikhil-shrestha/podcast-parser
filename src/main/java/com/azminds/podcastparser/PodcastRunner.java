@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-@Order(value = 2)
+@Order(value = 3)
 public class PodcastRunner implements CommandLineRunner {
 
   private static final Logger logger = LoggerFactory.getLogger(PodcastRunner.class);
@@ -102,8 +102,6 @@ public class PodcastRunner implements CommandLineRunner {
   @Override
   public void run(String... args) {
     System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
-
-//    CsvSplit.splitFile();
 
     Date date = new Date();
     long now = date.getTime();
