@@ -43,7 +43,14 @@ public class PodcastRunner implements CommandLineRunner {
       // Reading Records One by One in a String array
       String[] nextRecord;
       while ((nextRecord = csvReader.readNext()) != null) {
-        PodcastCSV podcast = new PodcastCSV(nextRecord[0], nextRecord[1], nextRecord[2], nextRecord[3], nextRecord[4], nextRecord[5], nextRecord[6]);
+        PodcastCSV podcast = new PodcastCSV();
+        podcast.setId(nextRecord[0]);
+        podcast.setUrl(nextRecord[1]);
+        podcast.setItunesId(nextRecord[2]);
+        podcast.setOriginalUrl(nextRecord[3]);
+        podcast.setNewestItemPubdate(nextRecord[4]);
+        podcast.setOldestItemPubdate(nextRecord[5]);
+        podcast.setLanguage(nextRecord[6]);
         podcasts.add(podcast);
       }
     } catch (IOException e) {
