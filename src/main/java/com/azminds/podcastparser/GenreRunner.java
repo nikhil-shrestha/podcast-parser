@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +15,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
+@Profile("test")
 @Component
 @Order(value = 2)
 public class GenreRunner implements CommandLineRunner {
@@ -27,9 +28,9 @@ public class GenreRunner implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws IOException {
-    List<Genre> genres = genreRepository.findAll();
-
-    if (genres.size() == 0) {
+    Long count = genreRepository.count();
+    System.out.println(count);
+    if (count == 0) {
       URL urlForGetRequest = new URL(API_ENDPOINT);
       String readLine = null;
       HttpURLConnection conn = (HttpURLConnection) urlForGetRequest.openConnection();

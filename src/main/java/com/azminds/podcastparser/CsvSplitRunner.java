@@ -1,12 +1,14 @@
 package com.azminds.podcastparser;
 
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.Scanner;
 
+@Profile("!test")
 @Component
 @Order(value = 1)
 public class CsvSplitRunner implements CommandLineRunner {

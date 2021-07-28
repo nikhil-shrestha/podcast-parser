@@ -2,8 +2,8 @@ package com.azminds.podcastparser.dao.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,10 +12,10 @@ import java.util.Date;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Data
-@EqualsAndHashCode
+@Entity(name = "Episode")
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "Episode")
 @Table(name = "episode")
 public class Episode implements Serializable {
 

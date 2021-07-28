@@ -2,18 +2,21 @@ package com.azminds.podcastparser.dao.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
-@EqualsAndHashCode
+@Entity(name = "Podcast")
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "Podcast")
 @Table(name = "podcast")
 public class Podcast implements Serializable {
 

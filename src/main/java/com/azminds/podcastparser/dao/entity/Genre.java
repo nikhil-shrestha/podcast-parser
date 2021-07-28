@@ -2,11 +2,10 @@ package com.azminds.podcastparser.dao.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
-
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,10 +13,10 @@ import java.util.Set;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Data
-@EqualsAndHashCode
+@Entity(name = "Genre")
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "Genre")
 @Table(name = "genre")
 public class Genre implements Serializable {
 
