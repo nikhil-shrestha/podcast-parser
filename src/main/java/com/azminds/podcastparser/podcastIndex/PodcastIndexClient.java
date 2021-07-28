@@ -1,4 +1,4 @@
-package com.azminds.podcastparser;
+package com.azminds.podcastparser.podcastIndex;
 
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
