@@ -9,8 +9,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-
 @Profile("test")
 @Component
 @Order(value = 3)
@@ -25,9 +23,6 @@ public class PodcastRunner implements CommandLineRunner {
   public void run(String... args) throws Exception {
     System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
 
-    Date date = new Date();
-    long now = date.getTime();
-    System.out.println("Start Time: " + now);
     ThreadPoolTaskExecutor threadPoolTaskExecutor = new ThreadPoolTaskExecutor();
     threadPoolTaskExecutor.setCorePoolSize(100);
     threadPoolTaskExecutor.setMaxPoolSize(100);
@@ -40,6 +35,5 @@ public class PodcastRunner implements CommandLineRunner {
       PodcastThread pdThread = new PodcastThread(podcastRepository, genreRepository, i + 1);
       threadPoolTaskExecutor.submit(pdThread);
     }
-    System.out.println("Total Time taken: " + ((new Date().getTime() - now) / 1000) + " second ");
   }
 }

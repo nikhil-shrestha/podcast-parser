@@ -9,6 +9,8 @@ import com.azminds.podcastparser.dao.entity.GenreEntity;
 import com.azminds.podcastparser.dao.entity.PodcastEntity;
 import com.azminds.podcastparser.dao.repository.GenreRepository;
 import com.azminds.podcastparser.dao.repository.PodcastRepository;
+import com.azminds.podcastparser.podcastIndex.PodcastIndexClient;
+import com.azminds.podcastparser.podcastIndex.PodcastIndexResponse;
 import com.icosillion.podengine.models.Episode;
 import com.icosillion.podengine.models.ITunesItemInfo;
 import com.icosillion.podengine.models.Podcast;
@@ -223,24 +225,23 @@ public class PodcastThread implements Callable<String> {
   }
 
   public String call() throws Exception {
-    logger.info("-- thread-- " + (threadId++) + " is working");
+    Date date = new Date();
+    long now = date.getTime();
+    System.out.println("Start Time: " + now);
+    logger.debug("-- thread-- " + (threadId++) + " is working");
     ArrayList<PodcastCSV> records = readCsv("FileNumber_" + threadId + ".csv");
-    logger.info("{}", records);
+    logger.debug("{}", records);
     Partition<PodcastCSV> arrayChunk = Partition.ofSize(records, 100);
-    logger.info("{}", arrayChunk);
-    System.out.println("CommandLine Runner!!!");
+    logger.debug("{}", arrayChunk);
     arrayChunk.forEach(arr -> {
       try {
         Date date1 = new Date();
         long now1 = date1.getTime();
-        System.out.println("Loop Start Time: " + now1);
+        logger.debug("Loop Start Time:-- thread-- " + (threadId++) + now1);
         Collection<String> arrIds = arr.stream().map(item -> item.getItunesId()).collect(Collectors.toList());
         System.out.println("chunk>>>" + arrIds.size());
         saveApplePodcast(arrIds);
-
-//          savePodcastIndex(arrIds);
-
-        System.out.println("Loop Time taken: " + ((new Date().getTime() - now1) / 1000) + " second ");
+        logger.debug("Loop Time taken:-- thread-- " + (threadId++) + ((new Date().getTime() - now1) / 1000) + " second ");
       } catch (IOException e) {
         System.out.println("[MAIN] IOException::");
         e.printStackTrace();
@@ -249,6 +250,7 @@ public class PodcastThread implements Callable<String> {
         e.printStackTrace();
       }
     });
+    logger.debug("Total Time taken:-- thread-- " + (threadId++) + ((new Date().getTime() - now) / 1000) + " second ");
     return "";
   }
 }
