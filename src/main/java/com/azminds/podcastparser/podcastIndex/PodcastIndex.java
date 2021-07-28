@@ -1,4 +1,4 @@
-package com.azminds.podcastparser;
+package com.azminds.podcastparser.podcastIndex;
 
 import java.security.MessageDigest;
 import java.util.*;
