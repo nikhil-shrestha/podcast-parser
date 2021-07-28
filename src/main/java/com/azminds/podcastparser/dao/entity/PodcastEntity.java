@@ -18,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "podcast")
-public class Podcast implements Serializable {
+public class PodcastEntity implements Serializable {
 
   @Id
   @SequenceGenerator(
@@ -131,28 +131,28 @@ public class Podcast implements Serializable {
     joinColumns = @JoinColumn(name = "podcast_id"),
     inverseJoinColumns = @JoinColumn(name = "genre_id")
   )
-  private Set<Genre> genres = new HashSet<>();
+  private Set<GenreEntity> genres = new HashSet<>();
 
   @OneToMany(
     cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
     mappedBy = "podcast"
   )
-  private List<Episode> episodes = new ArrayList<>();
+  private List<EpisodeEntity> episodes = new ArrayList<>();
 
-  public void addGenre(Genre genre) {
+  public void addGenre(GenreEntity genre) {
     if (!this.episodes.contains(genre)) {
       this.genres.add(genre);
     }
   }
 
-  public void addEpisode(Episode episode) {
+  public void addEpisode(EpisodeEntity episode) {
     if (!this.episodes.contains(episode)) {
       this.episodes.add(episode);
       episode.setPodcast(this);
     }
   }
 
-  public void removeEpisode(Episode episode) {
+  public void removeEpisode(EpisodeEntity episode) {
     if (this.episodes.contains(episode)) {
       this.episodes.remove(episode);
       episode.setPodcast(null);

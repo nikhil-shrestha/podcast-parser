@@ -17,7 +17,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "episode")
-public class Episode implements Serializable {
+public class EpisodeEntity implements Serializable {
 
   @Id
   @SequenceGenerator(
@@ -88,5 +88,5 @@ public class Episode implements Serializable {
     nullable = false,
     referencedColumnName = "id"
   )
-  private Podcast podcast;
+  private PodcastEntity podcast;
 }

@@ -18,7 +18,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "genre")
-public class Genre implements Serializable {
+public class GenreEntity implements Serializable {
 
   @Id
   @SequenceGenerator(
@@ -50,5 +50,5 @@ public class Genre implements Serializable {
   private String genreIdOld;
 
   @ManyToMany(fetch = FetchType.EAGER, mappedBy = "genres")
-  private Set<Podcast> podcasts = new HashSet<>();
+  private Set<PodcastEntity> podcasts = new HashSet<>();
 }
