@@ -122,6 +122,13 @@ public class PodcastEntity implements Serializable {
   @Column(name = "episode_count")
   private Integer episodeCount;
 
+  @OneToMany(
+    cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+    mappedBy = "podcast"
+  )
+  private List<EpisodeEntity> episodes = new ArrayList<>();
+
+  // TODO:: review many-to-many relation
   @ManyToMany(
     fetch = FetchType.LAZY,
     cascade = {CascadeType.MERGE}
@@ -132,12 +139,6 @@ public class PodcastEntity implements Serializable {
     inverseJoinColumns = @JoinColumn(name = "genre_id")
   )
   private Set<GenreEntity> genres = new HashSet<>();
-
-  @OneToMany(
-    cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
-    mappedBy = "podcast"
-  )
-  private List<EpisodeEntity> episodes = new ArrayList<>();
 
   public void addGenre(GenreEntity genre) {
     if (!this.episodes.contains(genre)) {
