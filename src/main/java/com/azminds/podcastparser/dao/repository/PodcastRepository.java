@@ -1,16 +1,16 @@
 package com.azminds.podcastparser.dao.repository;
 
-import com.azminds.podcastparser.dao.entity.Podcast;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import com.azminds.podcastparser.dao.entity.PodcastEntity;
+import org.springframework.data.jdbc.repository.query.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface PodcastRepository extends JpaRepository<Podcast, Long> {
+public interface PodcastRepository extends CrudRepository<PodcastEntity, Long> {
 
-  @Query("SELECT s FROM Podcast s WHERE s.collectionId = ?1")
-  Optional<Podcast> findByCollectionId(Long id);
-
+  @Query("SELECT s FROM Podcast s WHERE s.collection_id = :id")
+  Optional<PodcastEntity> findByCollectionId(@Param("id") Long id);
 }

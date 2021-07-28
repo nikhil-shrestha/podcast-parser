@@ -1,6 +1,6 @@
 package com.azminds.podcastparser;
 
-import com.azminds.podcastparser.dao.entity.Genre;
+import com.azminds.podcastparser.dao.entity.GenreEntity;
 import com.azminds.podcastparser.dao.repository.GenreRepository;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,7 +49,7 @@ public class GenreRunner implements CommandLineRunner {
         JSONArray jsonArr = new JSONArray(json);
         jsonArr.forEach(item -> {
           JSONObject obj = (JSONObject) item;
-          Genre genre = new Genre();
+          GenreEntity genre = new GenreEntity();
           genre.setGenreIdOld(obj.get("id").toString());
           genre.setName(obj.get("name").toString());
           genreRepository.save(genre);

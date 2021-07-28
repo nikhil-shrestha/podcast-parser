@@ -4,7 +4,9 @@ import be.ceau.itunesapi.Lookup;
 import be.ceau.itunesapi.request.Entity;
 import be.ceau.itunesapi.response.Response;
 import be.ceau.itunesapi.response.Result;
-import com.azminds.podcastparser.dao.entity.Genre;
+import com.azminds.podcastparser.dao.entity.EpisodeEntity;
+import com.azminds.podcastparser.dao.entity.GenreEntity;
+import com.azminds.podcastparser.dao.entity.PodcastEntity;
 import com.azminds.podcastparser.dao.repository.GenreRepository;
 import com.azminds.podcastparser.dao.repository.PodcastRepository;
 import com.icosillion.podengine.models.Episode;
@@ -88,7 +90,11 @@ public class PodcastRunner implements CommandLineRunner {
     try {
 //      Optional<com.azminds.podcastparser.dao.entity.Podcast> podcastDbData = podcastRepository.findByCollectionId(rslt.getCollectionId());
 //      if (!podcastDbData.isPresent()) {
-        com.azminds.podcastparser.dao.entity.Podcast podcastEntity = new com.azminds.podcastparser.dao.entity.Podcast();
+        PodcastEntity podcastEntity = PodcastEntity.create(
+          rslt.getWrapperType(),
+          rslt.getKind(),
+
+        );
         podcastEntity.setCollectionId(rslt.getCollectionId());
         podcastEntity.setCollectionName(rslt.getCollectionName());
         podcastEntity.setDescription(rslt.getDescription());
@@ -96,7 +102,7 @@ public class PodcastRunner implements CommandLineRunner {
         podcastEntity.setArtistName(rslt.getArtistName());
         podcastEntity.setArtistViewUrl(rslt.getArtistViewUrl());
         podcastEntity.setWrapperType(rslt.getWrapperType());
-        podcastEntity.setKind(rslt.getKind());
+        podcastEntity.setKind();
         podcastEntity.setFeedUrl(rslt.getFeedUrl());
         podcastEntity.setPreviewUrl(rslt.getPreviewUrl());
         podcastEntity.setArtworkUrl30(rslt.getArtworkUrl30());
@@ -114,9 +120,9 @@ public class PodcastRunner implements CommandLineRunner {
 
         for (String id : rslt.getGenreIds()) {
           if (!id.equals("26")) {
-            Optional<Genre> genreDbData = genreRepository.findByGenreIdOld(id);
+            Optional<GenreEntity> genreDbData = genreRepository.findByGenreIdOld(id);
             if (genreDbData.isPresent()) {
-              Genre genreEntity = genreDbData.get();
+              GenreEntity genreEntity = genreDbData.get();
               podcastEntity.addGenre(genreEntity);
             }
           }
@@ -168,7 +174,7 @@ public class PodcastRunner implements CommandLineRunner {
             } catch (Exception e) {
             }
 
-            com.azminds.podcastparser.dao.entity.Episode episodeEntity = new com.azminds.podcastparser.dao.entity.Episode();
+            EpisodeEntity episodeEntity = new EpisodeEntity();
             episodeEntity.setTitle(episode.getTitle());
             episodeEntity.setDescription(description1);
             episodeEntity.setGuid(episode.getGUID());
