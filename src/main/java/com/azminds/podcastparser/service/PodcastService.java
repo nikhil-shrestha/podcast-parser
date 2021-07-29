@@ -5,6 +5,7 @@ import be.ceau.itunesapi.request.Entity;
 import be.ceau.itunesapi.response.Response;
 import be.ceau.itunesapi.response.Result;
 import com.azminds.podcastparser.dao.entity.EpisodeEntity;
+import com.azminds.podcastparser.dao.entity.GenreEntity;
 import com.azminds.podcastparser.dao.entity.PodcastEntity;
 import com.azminds.podcastparser.dao.repository.GenreRepository;
 import com.azminds.podcastparser.dao.repository.PodcastRepository;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collection;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -52,44 +53,17 @@ public class PodcastService {
   }
 
   public void savePodcastFinal(Result rslt) throws Exception {
-    try {
-      PodcastEntity podcastEntity = new PodcastEntity();
-      podcastEntity.setCollectionId(rslt.getCollectionId());
-      podcastEntity.setCollectionName(rslt.getCollectionName());
-      podcastEntity.setDescription(rslt.getDescription());
-      podcastEntity.setCollectionViewUrl(rslt.getCollectionViewUrl());
-      podcastEntity.setArtistName(rslt.getArtistName());
-      podcastEntity.setArtistViewUrl(rslt.getArtistViewUrl());
-      podcastEntity.setWrapperType(rslt.getWrapperType());
-      podcastEntity.setKind(rslt.getKind());
-      podcastEntity.setFeedUrl(rslt.getFeedUrl());
-      podcastEntity.setPreviewUrl(rslt.getPreviewUrl());
-      podcastEntity.setArtworkUrl30(rslt.getArtworkUrl30());
-      podcastEntity.setArtworkUrl60(rslt.getArtworkUrl60());
-      podcastEntity.setArtworkUrl100(rslt.getArtworkUrl100());
-      podcastEntity.setArtworkUrl512(rslt.getArtworkUrl512());
-      podcastEntity.setArtworkUrl600(rslt.getArtworkUrl600());
-      podcastEntity.setReleaseDate(rslt.getReleaseDate());
-      podcastEntity.setTrackCount(rslt.getTrackCount());
-      podcastEntity.setCountry(rslt.getCountry());
-      podcastEntity.setCountry(rslt.getCountry());
-      podcastEntity.setCopyright(rslt.getCopyright());
-      podcastEntity.setShortDescription(rslt.getShortDescription());
-      podcastEntity.setLongDescription(rslt.getLongDescription());
-
-//      for (String id : rslt.getGenreIds()) {
-//        if (!id.equals("26")) {
-//          GenreEntity genreEntity = genreRepository.findByGenreIdOld(id);
-//          podcastEntity.addGenre(genreEntity);
-//        }
-//      }
+    if (rslt.getFeedUrl() != null) {
+      String description;
+      int episodeCount;
 
       URL url = new URL(rslt.getFeedUrl());
+      List<EpisodeEntity> episodeList = new ArrayList<>();
       try {
         Podcast podcastData = new Podcast(url);
 //        System.out.println("- " + podcastData.getTitle() + " " + podcastData.getEpisodes().size());
-        podcastEntity.setDescription(podcastData.getDescription());
-        podcastEntity.setEpisodeCount(podcastData.getEpisodes().size());
+        description = podcastData.getDescription();
+        episodeCount = podcastData.getEpisodes().size();
 
         Collection<Episode> episodes = podcastData.getEpisodes();
         // List all episodes
@@ -105,18 +79,59 @@ public class PodcastService {
           episodeEntity.setLink(episode.getEnclosure().getURL().toString());
           episodeEntity.setDuration(episode.getEnclosure().getLength());
           episodeEntity.setType(episode.getEnclosure().getType());
-          podcastEntity.addEpisode(episodeEntity);
+          episodeList.add(episodeEntity);
         }
       } catch (Exception e) {
         e.printStackTrace();
         throw new Exception("[Episode] Exception::", e);
       }
-      System.out.println("before save!!!!");
-      podcastRepository.save(podcastEntity);
-    } catch (Exception e) {
-      // Throwing an exception
-      e.printStackTrace();
-      throw new Exception("Exception is caught::", e);
+
+      try {
+        PodcastEntity podcastEntity = new PodcastEntity();
+        podcastEntity.setCollectionId(rslt.getCollectionId());
+        podcastEntity.setCollectionName(rslt.getCollectionName());
+        podcastEntity.setDescription(rslt.getDescription() != null ? rslt.getDescription() : description);
+        podcastEntity.setCollectionViewUrl(rslt.getCollectionViewUrl());
+        podcastEntity.setArtistName(rslt.getArtistName());
+        podcastEntity.setArtistViewUrl(rslt.getArtistViewUrl());
+        podcastEntity.setWrapperType(rslt.getWrapperType());
+        podcastEntity.setKind(rslt.getKind());
+        podcastEntity.setFeedUrl(rslt.getFeedUrl());
+        podcastEntity.setPreviewUrl(rslt.getPreviewUrl());
+        podcastEntity.setArtworkUrl30(rslt.getArtworkUrl30());
+        podcastEntity.setArtworkUrl60(rslt.getArtworkUrl60());
+        podcastEntity.setArtworkUrl100(rslt.getArtworkUrl100());
+        podcastEntity.setArtworkUrl512(rslt.getArtworkUrl512());
+        podcastEntity.setArtworkUrl600(rslt.getArtworkUrl600());
+        podcastEntity.setReleaseDate(rslt.getReleaseDate());
+        podcastEntity.setTrackCount(rslt.getTrackCount());
+        podcastEntity.setCountry(rslt.getCountry());
+        podcastEntity.setCountry(rslt.getCountry());
+        podcastEntity.setCopyright(rslt.getCopyright());
+        podcastEntity.setShortDescription(rslt.getShortDescription());
+        podcastEntity.setLongDescription(rslt.getLongDescription());
+        podcastEntity.setEpisodeCount(episodeCount);
+
+        podcastEntity.setEpisodes(episodeList);
+
+        for (String id : rslt.getGenreIds()) {
+          if (!id.equals("26")) {
+            try {
+              GenreEntity genreFound = genreRepository.findByGenreIdOld(Integer.parseInt(id));
+              podcastEntity.addGenre(genreFound);
+            } catch (Exception e) {
+              throw new Exception("[Genre] Exception::", e);
+            }
+          }
+        }
+
+        System.out.println("before save!!!!");
+        podcastRepository.save(podcastEntity);
+      } catch (Exception e) {
+        // Throwing an exception
+        e.printStackTrace();
+        throw new Exception("[Podcast] Exception::", e);
+      }
     }
   }
 

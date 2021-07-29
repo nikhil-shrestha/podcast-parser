@@ -12,7 +12,7 @@ import java.util.Scanner;
 @Component
 @Order(value = 1)
 public class CsvSplitRunner implements CommandLineRunner {
-  public static void splitLargeFile(
+  public void splitLargeFile(
     final String fileName,
     final String extension,
     final int maxLines) {

@@ -6,11 +6,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 @Repository
 public interface PodcastRepository extends CrudRepository<PodcastEntity, Long> {
 
-  @Query("SELECT s FROM Podcast s WHERE s.collection_id = :id")
-  Optional<PodcastEntity> findByCollectionId(@Param("id") Long id);
+  @Query("SELECT * FROM podcast WHERE collection_id = :id")
+  PodcastEntity findByCollectionId(@Param("id") Long id);
 }

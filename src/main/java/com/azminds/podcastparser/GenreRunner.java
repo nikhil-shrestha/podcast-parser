@@ -28,7 +28,7 @@ public class GenreRunner implements CommandLineRunner {
 
   @Override
   public void run(String... args) throws IOException {
-    Long count = genreRepository.count();
+    long count = genreRepository.count();
     System.out.println(count);
     if (count == 0) {
       URL urlForGetRequest = new URL(API_ENDPOINT);
@@ -49,9 +49,10 @@ public class GenreRunner implements CommandLineRunner {
         JSONArray jsonArr = new JSONArray(json);
         jsonArr.forEach(item -> {
           JSONObject obj = (JSONObject) item;
-          GenreEntity genre = new GenreEntity();
-          genre.setGenreIdOld(obj.get("id").toString());
-          genre.setName(obj.get("name").toString());
+          GenreEntity genre = new GenreEntity(
+            obj.get("name").toString(),
+            Integer.parseInt(obj.get("id").toString())
+          );
           genreRepository.save(genre);
         });
       } else {
