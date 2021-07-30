@@ -6,7 +6,6 @@ import be.ceau.itunesapi.response.Response;
 import be.ceau.itunesapi.response.Result;
 import com.azminds.podcastparser.dao.entity.EpisodeEntity;
 import com.azminds.podcastparser.dao.entity.PodcastEntity;
-import com.azminds.podcastparser.dao.repository.GenreRepository;
 import com.azminds.podcastparser.dao.repository.PodcastRepository;
 import com.icosillion.podengine.models.Episode;
 import com.icosillion.podengine.models.Podcast;
@@ -20,6 +19,8 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -29,8 +30,11 @@ public class PodcastService {
 
   @Autowired
   PodcastRepository podcastRepository;
-  @Autowired
-  GenreRepository genreRepository;
+
+  static class GenreData {
+    Long id;
+    String name;
+  }
 
   public static boolean isUrlValid(String url) {
     try {
@@ -77,46 +81,78 @@ public class PodcastService {
       podcastEntity.setShortDescription(rslt.getShortDescription());
       podcastEntity.setLongDescription(rslt.getLongDescription());
 
-//      for (String id : rslt.getGenreIds()) {
-//        if (!id.equals("26")) {
-//          GenreEntity genreEntity = genreRepository.findByGenreIdOld(id);
-//          podcastEntity.addGenre(genreEntity);
-//        }
-//      }
+      GenreData[] genreData = new GenreData[rslt.getGenreIds().size()];
+      int i = 0;
+      for (String id : rslt.getGenreIds()) {
+        genreData[i] = new GenreData();
+        genreData[i].id = Long.parseLong(id);
+        i++;
+      }
+
+      i = 0;
+      for (String name : rslt.getGenres()) {
+        genreData[i].name = name;
+        i++;
+      }
+
+      Set<String> genresMap = new HashSet<>();
+      for (GenreData genre : genreData) {
+        if (genre.id != 26 || !genre.name.equals("Podcasts")) {
+          genresMap.add(genre.name);
+        }
+      }
+      podcastEntity.setGenres(genresMap);
 
       URL url = new URL(rslt.getFeedUrl());
       try {
         Podcast podcastData = new Podcast(url);
 //        System.out.println("- " + podcastData.getTitle() + " " + podcastData.getEpisodes().size());
-        podcastEntity.setDescription(podcastData.getDescription());
+        podcastEntity.setDescription(podcastData.getDescription() != null ? podcastData.getDescription() : "");
         podcastEntity.setEpisodeCount(podcastData.getEpisodes().size());
 
         Collection<Episode> episodes = podcastData.getEpisodes();
         // List all episodes
         for (Episode episode : episodes) {
 //          System.out.println("\n- " + episode.getGUID());
+
+          String epiDescription = "";
+          try {
+            epiDescription = episode.getDescription();
+          } catch (Exception e){
+
+          }
+
+          long epiDuration = 0;
+          try{
+            epiDuration = episode.getEnclosure().getLength();
+          } catch (Exception e){
+
+          }
+
           EpisodeEntity episodeEntity = new EpisodeEntity();
           episodeEntity.setTitle(episode.getTitle());
-          episodeEntity.setDescription(episode.getDescription());
+          episodeEntity.setDescription(epiDescription);
           episodeEntity.setGuid(episode.getGUID());
-          episodeEntity.setHostedUrl(episode.getLink().toString());
+          episodeEntity.setHostedUrl(episode.getLink() != null ? episode.getLink().toString() : null);
           episodeEntity.setPubDate(episode.getPubDate());
-          episodeEntity.setDurationString(episode.getITunesInfo().getDuration());
+          episodeEntity.setDurationString(episode.getITunesInfo().getDuration()  != null ? episode.getITunesInfo().getDuration(): null);
           episodeEntity.setLink(episode.getEnclosure().getURL().toString());
-          episodeEntity.setDuration(episode.getEnclosure().getLength());
-          episodeEntity.setType(episode.getEnclosure().getType());
+          episodeEntity.setDuration(epiDuration != 0 ? epiDuration : null);
+          episodeEntity.setType(episode.getEnclosure().getType() != null ? episode.getEnclosure().getType() : null);
+
+          System.out.println("episode added!!");
           podcastEntity.addEpisode(episodeEntity);
         }
       } catch (Exception e) {
         e.printStackTrace();
         throw new Exception("[Episode] Exception::", e);
       }
-      System.out.println("before save!!!!");
+      System.out.println("Podcast before save!!!!");
       podcastRepository.save(podcastEntity);
     } catch (Exception e) {
       // Throwing an exception
       e.printStackTrace();
-      throw new Exception("Exception is caught::", e);
+      throw new Exception("[Podcast] Exception is caught::", e);
     }
   }
 

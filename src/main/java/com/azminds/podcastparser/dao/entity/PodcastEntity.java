@@ -128,19 +128,10 @@ public class PodcastEntity implements Serializable {
   )
   private List<EpisodeEntity> episodes = new ArrayList<>();
 
-  // TODO:: review many-to-many relation
-  @ManyToMany(
-    fetch = FetchType.LAZY,
-    cascade = {CascadeType.MERGE}
-  )
-  @JoinTable(
-    name = "podcast_genre",
-    joinColumns = @JoinColumn(name = "podcast_id"),
-    inverseJoinColumns = @JoinColumn(name = "genre_id")
-  )
-  private Set<GenreEntity> genres = new HashSet<>();
+  @ElementCollection
+  private Set<String> genres = new HashSet<>();
 
-  public void addGenre(GenreEntity genre) {
+  public void addGenre(String genre) {
     if (!this.episodes.contains(genre)) {
       this.genres.add(genre);
     }
