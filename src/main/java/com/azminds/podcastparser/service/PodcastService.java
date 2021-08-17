@@ -9,19 +9,22 @@ import com.azminds.podcastparser.dao.entity.PodcastEntity;
 import com.azminds.podcastparser.dao.repository.PodcastRepository;
 import com.icosillion.podengine.models.Episode;
 import com.icosillion.podengine.models.Podcast;
+import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+
+import static com.azminds.podcastparser.utils.DateUtils.ComparingDates;
+import static com.azminds.podcastparser.utils.DateUtils.StringToDate;
 
 @Service
 public class PodcastService {
@@ -55,6 +58,39 @@ public class PodcastService {
     return response.getResults();
   }
 
+//  //Episodes
+//  public List<Episode> getLatestEpisodes(Podcast podcast, String prevReleaseDate) throws Exception{
+//    // Create Field object
+//    Field privateField
+//            = Podcast.class.getDeclaredField("channelElement");
+//
+//    // Set the accessibility as true
+//    privateField.setAccessible(true);
+//
+//    // Store the value of private field in variable
+//    Element channelElement = (Element) privateField.get(podcast);
+//    List<Episode> episodes = new ArrayList<>();
+//    for (Object itemObject : channelElement.elements("item")) {
+//      if (!(itemObject instanceof Element)) {
+//        continue;
+//      }
+//      Episode episode = new Episode((Element) itemObject);
+//      System.out.println("episode >>> with published date "+ episode.getPubDate());
+//      if (ComparingDates(episode.getPubDate(),StringToDate(prevReleaseDate)) > 0) {
+//        System.out.println("Episode added ");
+//        episodes.add(episode);
+//      } else {
+//        break; // The episodes in the rss feed are always sorted in ascending order and when we encounter episode published date lesser than release date, we break the loop
+//      }
+//    }
+//
+//    if (episodes.size() == 0) {
+//      return null;
+//    }
+//
+//    return Collections.unmodifiableList(episodes);
+//  }
+
   public void savePodcastFinal(Result rslt) throws Exception {
     try {
       PodcastEntity podcastEntity = new PodcastEntity();
@@ -75,7 +111,6 @@ public class PodcastService {
       podcastEntity.setArtworkUrl600(rslt.getArtworkUrl600());
       podcastEntity.setReleaseDate(rslt.getReleaseDate());
       podcastEntity.setTrackCount(rslt.getTrackCount());
-      podcastEntity.setCountry(rslt.getCountry());
       podcastEntity.setCountry(rslt.getCountry());
       podcastEntity.setCopyright(rslt.getCopyright());
       podcastEntity.setShortDescription(rslt.getShortDescription());
@@ -106,14 +141,14 @@ public class PodcastService {
       URL url = new URL(rslt.getFeedUrl());
       try {
         Podcast podcastData = new Podcast(url);
-//        System.out.println("- " + podcastData.getTitle() + " " + podcastData.getEpisodes().size());
+        // System.out.println("- " + podcastData.getTitle() + " " + podcastData.getEpisodes().size());
         podcastEntity.setDescription(podcastData.getDescription() != null ? podcastData.getDescription() : "");
         podcastEntity.setEpisodeCount(podcastData.getEpisodes().size());
 
         Collection<Episode> episodes = podcastData.getEpisodes();
         // List all episodes
         for (Episode episode : episodes) {
-//          System.out.println("\n- " + episode.getGUID());
+        //  System.out.println("\n- " + episode.getGUID());
 
           String epiDescription = "";
           try {
@@ -140,21 +175,138 @@ public class PodcastService {
           episodeEntity.setDuration(epiDuration != 0 ? epiDuration : null);
           episodeEntity.setType(episode.getEnclosure().getType() != null ? episode.getEnclosure().getType() : null);
 
-          System.out.println("episode added!!");
+          // System.out.println("episode added!!");
           podcastEntity.addEpisode(episodeEntity);
         }
       } catch (Exception e) {
-        e.printStackTrace();
+        // e.printStackTrace();
         throw new Exception("[Episode] Exception::", e);
       }
-      System.out.println("Podcast before save!!!!");
+        // System.out.println("Podcast before save!!!!");
       podcastRepository.save(podcastEntity);
     } catch (Exception e) {
       // Throwing an exception
-      e.printStackTrace();
+      // e.printStackTrace();
       throw new Exception("[Podcast] Exception is caught::", e);
     }
   }
+
+  public void updatePodcastFinal(Result rslt) throws Exception {
+    try {
+      Optional<PodcastEntity> podcastEntityExists = podcastRepository.findByCollectionId(rslt.getCollectionId());
+      if (podcastEntityExists.isPresent()) {
+        PodcastEntity podcastEntity = podcastEntityExists.get();
+        System.out.println("podcast Entity got with releasedate" + podcastEntity.getReleaseDate() + "itunes release date"+ rslt.getReleaseDate());
+        if (ComparingDates(StringToDate(podcastEntity.getReleaseDate()), StringToDate(rslt.getReleaseDate())) == 0) {
+          System.out.println("This podcast is updated");
+          podcastEntity.setCollectionName(rslt.getCollectionName());
+          podcastEntity.setDescription(rslt.getDescription());
+          podcastEntity.setCollectionViewUrl(rslt.getCollectionViewUrl());
+          podcastEntity.setArtistName(rslt.getArtistName());
+          podcastEntity.setArtistViewUrl(rslt.getArtistViewUrl());
+          podcastEntity.setWrapperType(rslt.getWrapperType());
+          podcastEntity.setKind(rslt.getKind());
+          podcastEntity.setFeedUrl(rslt.getFeedUrl());
+          podcastEntity.setPreviewUrl(rslt.getPreviewUrl());
+          podcastEntity.setArtworkUrl30(rslt.getArtworkUrl30());
+          podcastEntity.setArtworkUrl60(rslt.getArtworkUrl60());
+          podcastEntity.setArtworkUrl100(rslt.getArtworkUrl100());
+          podcastEntity.setArtworkUrl512(rslt.getArtworkUrl512());
+          podcastEntity.setArtworkUrl600(rslt.getArtworkUrl600());
+          podcastEntity.setReleaseDate(rslt.getReleaseDate());
+          podcastEntity.setTrackCount(rslt.getTrackCount());
+          podcastEntity.setCountry(rslt.getCountry());
+          podcastEntity.setCopyright(rslt.getCopyright());
+          podcastEntity.setShortDescription(rslt.getShortDescription());
+          podcastEntity.setLongDescription(rslt.getLongDescription());
+
+          GenreData[] genreData = new GenreData[rslt.getGenreIds().size()];
+          int i = 0;
+          for (String id : rslt.getGenreIds()) {
+            genreData[i] = new GenreData();
+            genreData[i].id = Long.parseLong(id);
+            i++;
+          }
+
+          i = 0;
+          for (String name : rslt.getGenres()) {
+            genreData[i].name = name;
+            i++;
+          }
+
+          Set<String> genresMap = new HashSet<>();
+          for (GenreData genre : genreData) {
+            if (genre.id != 26 || !genre.name.equals("Podcasts")) {
+              genresMap.add(genre.name);
+            }
+          }
+          podcastEntity.setGenres(genresMap);
+
+          URL url = new URL(rslt.getFeedUrl());
+          try {
+            Podcast podcastData = new Podcast(url);
+             System.out.println("- " + podcastData.getTitle() + " " + podcastData.getEpisodes().size());
+            podcastEntity.setDescription(podcastData.getDescription() != null ? podcastData.getDescription() : "");
+            podcastEntity.setEpisodeCount(podcastData.getEpisodes().size());
+
+            Collection<Episode> episodes = podcastData.getEpisodes();
+            // List all episodes
+            for (Episode episode : episodes) {
+
+              if (ComparingDates(episode.getPubDate(),StringToDate(podcastEntity.getReleaseDate())) > 0){
+                System.out.println("\n- " + episode.getGUID());
+
+                String epiDescription = "";
+                try {
+                  epiDescription = episode.getDescription();
+                } catch (Exception e) {
+
+                }
+
+                long epiDuration = 0;
+                try {
+                  epiDuration = episode.getEnclosure().getLength();
+                } catch (Exception e) {
+
+                }
+
+                EpisodeEntity episodeEntity = new EpisodeEntity();
+                episodeEntity.setTitle(episode.getTitle());
+                episodeEntity.setDescription(epiDescription);
+                episodeEntity.setGuid(episode.getGUID());
+                episodeEntity.setHostedUrl(episode.getLink() != null ? episode.getLink().toString() : null);
+                episodeEntity.setPubDate(episode.getPubDate());
+                episodeEntity.setDurationString(episode.getITunesInfo().getDuration() != null ? episode.getITunesInfo().getDuration() : null);
+                episodeEntity.setLink(episode.getEnclosure().getURL().toString());
+                episodeEntity.setDuration(epiDuration != 0 ? epiDuration : null);
+                episodeEntity.setType(episode.getEnclosure().getType() != null ? episode.getEnclosure().getType() : null);
+
+                podcastEntity.addEpisode(episodeEntity);
+                System.out.println("episode added!!");
+
+              } else {
+                break;
+              }
+            }
+          } catch (Exception e) {
+             e.printStackTrace();
+            throw new Exception("[Episode] Exception::", e);
+          }
+           System.out.println("Podcast before save!!!!");
+          podcastRepository.save(podcastEntity);
+        } else {
+          throw new Exception("Podcasts are already upto date");
+        }
+      } else {
+        throw new Exception("Podcast not found");
+      }
+    } catch (Exception e){
+      // Throwing an exception
+       e.printStackTrace();
+      throw new Exception("[Podcast] Exception is caught::", e);
+    }
+  }
+
 
   @Async
   public CompletableFuture<String> saveApplePodcast(Collection<String> arrIds) throws Exception {
@@ -166,6 +318,27 @@ public class PodcastService {
       if (isUrlValid(rslt.getFeedUrl())) {
         try {
           savePodcastFinal(rslt);
+        } catch (Exception e) {
+//          e.printStackTrace();
+        }
+      }
+    });
+    long end = System.currentTimeMillis();
+    logger.info("Total time {}", (end - start));
+    return CompletableFuture.completedFuture("complete!!");
+  }
+
+  @Async
+  public CompletableFuture<String> updateApplePodcast(Collection<String> arrIds) throws Exception {
+    long start = System.currentTimeMillis();
+
+    Collection<Result> results = getBatchPodcast(arrIds);
+    System.out.println("results>>>" + results);
+    logger.info("Result {}", results.size(), "" + Thread.currentThread().getName());
+    results.forEach(rslt -> {
+      if (isUrlValid(rslt.getFeedUrl())) {
+        try {
+          updatePodcastFinal(rslt);
         } catch (Exception e) {
           e.printStackTrace();
         }

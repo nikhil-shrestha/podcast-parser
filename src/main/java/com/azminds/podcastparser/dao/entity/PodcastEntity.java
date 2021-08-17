@@ -123,8 +123,7 @@ public class PodcastEntity implements Serializable {
   private Integer episodeCount;
 
   @OneToMany(
-    cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
-    mappedBy = "podcast"
+    cascade = {CascadeType.PERSIST, CascadeType.REMOVE},mappedBy = "podcast"
   )
   private List<EpisodeEntity> episodes = new ArrayList<>();
 
@@ -150,4 +149,5 @@ public class PodcastEntity implements Serializable {
       episode.setPodcast(null);
     }
   }
+
 }

@@ -52,9 +52,9 @@ public class PodcastRunner implements CommandLineRunner {
         podcasts.add(podcast);
       }
     } catch (IOException e) {
-      e.printStackTrace();
+//      e.printStackTrace();
     } catch (CsvValidationException e) {
-      e.printStackTrace();
+//      e.printStackTrace();
     }
     return podcasts;
   }
@@ -76,7 +76,7 @@ public class PodcastRunner implements CommandLineRunner {
           service.saveApplePodcast(arrIds);
           logger.debug("Loop Time taken: " + ((new Date().getTime() - now) / 1000) + " second " + Thread.currentThread().getName());
         } catch (Exception e) {
-          e.printStackTrace();
+//          e.printStackTrace();
         }
       });
     }

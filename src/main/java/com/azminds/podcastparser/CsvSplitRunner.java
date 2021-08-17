@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.util.Scanner;
 
-@Profile("!test")
+@Profile("TrendingPodcast")
 @Component
 @Order(value = 1)
 public class CsvSplitRunner implements CommandLineRunner {
@@ -32,7 +32,7 @@ public class CsvSplitRunner implements CommandLineRunner {
       }
       writer.close();
     } catch (Exception e) {
-      e.printStackTrace();
+//      e.printStackTrace();
     }
   }
 
@@ -63,7 +63,7 @@ public class CsvSplitRunner implements CommandLineRunner {
   @Override
   public void run(String... args) {
     try {
-      int lines = 1000;  //set this to whatever number of lines you need in each file
+      int lines = 2;  //set this to whatever number of lines you need in each file
       int count = 0;
       String inputfile = "file.csv";
       File file = new File(inputfile);
@@ -83,7 +83,7 @@ public class CsvSplitRunner implements CommandLineRunner {
 
       myFunction(lines, files);
     } catch (IOException e) {
-      e.printStackTrace();
+//      e.printStackTrace();
     }
   }
 }
