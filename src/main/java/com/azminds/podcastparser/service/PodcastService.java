@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -331,7 +332,8 @@ public class PodcastService {
           List<EpisodeEntity> episodeEntityList = new ArrayList<>();
 
           for (Episode episode : episodes) {
-            Date oldPubDate = trendingPodcast.getLastEpisodeDate();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date oldPubDate = sdf.parse(podcastEntity.getReleaseDate());
             Date newPubDate = episode.getPubDate();
 
             if (!oldPubDate.after(newPubDate) && !newPubDate.before(oldPubDate)) {
