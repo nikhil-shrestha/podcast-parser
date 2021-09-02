@@ -7,9 +7,7 @@ import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -122,32 +120,6 @@ public class PodcastEntity implements Serializable {
   @Column(name = "episode_count")
   private Integer episodeCount;
 
-  @OneToMany(
-    cascade = {CascadeType.PERSIST, CascadeType.REMOVE},mappedBy = "podcast"
-  )
-  private List<EpisodeEntity> episodes = new ArrayList<>();
-
   @ElementCollection
   private Set<String> genres = new HashSet<>();
-
-  public void addGenre(String genre) {
-    if (!this.episodes.contains(genre)) {
-      this.genres.add(genre);
-    }
-  }
-
-  public void addEpisode(EpisodeEntity episode) {
-    if (!this.episodes.contains(episode)) {
-      this.episodes.add(episode);
-      episode.setPodcast(this);
-    }
-  }
-
-  public void removeEpisode(EpisodeEntity episode) {
-    if (this.episodes.contains(episode)) {
-      this.episodes.remove(episode);
-      episode.setPodcast(null);
-    }
-  }
-
 }

@@ -1,53 +1,51 @@
 package com.azminds.podcastparser;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class TrendingPodcastCSV {
-    private String id;
-    private String collection_id;
-    private String feed_url;
-    private String release_date;
-    private String language;
+  private Long id;
+  private Long collectionId;
+  private String feedUrl;
+  private Date lastEpisodeDate;
 
-    public TrendingPodcastCSV() {
-    }
+  public TrendingPodcastCSV() {
+  }
 
-    public String getId() {
-        return id;
-    }
+  public Long getId() {
+    return id;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+  public void setId(String id) {
+    this.id = Long.parseLong(id);
+  }
 
-    public String getFeedUrl() {
-        return feed_url;
-    }
+  public String getFeedUrl() {
+    return feedUrl;
+  }
 
-    public void setFeedUrl(String feed_url) {
-        this.feed_url = feed_url;
-    }
+  public void setFeedUrl(String feed_url) {
+    this.feedUrl = feed_url;
+  }
 
-    public String getCollectionId() {
-        return collection_id;
-    }
+  public Long getCollectionId() {
+    return collectionId;
+  }
 
-    public void setCollectionId(String collection_id) {
-        this.collection_id = collection_id;
-    }
+  public void setCollectionId(String collection_id) {
+    this.collectionId = Long.parseLong(collection_id);
+  }
 
-    public String getReleaseDate() {
-        return release_date;
-    }
+  public Date getLastEpisodeDate() {
+    return lastEpisodeDate;
+  }
 
-    public void setReleaseDate(String release_date) {
-        this.release_date = release_date;
+  public void setLastEpisodeDate(String lastEpisodeDate) {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    try {
+      this.lastEpisodeDate = sdf.parse(lastEpisodeDate);
+    } catch (Exception e) {
+      System.out.println("Error occurred " + e.getMessage());
     }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
+  }
 }

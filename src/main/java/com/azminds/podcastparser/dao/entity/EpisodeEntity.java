@@ -82,11 +82,6 @@ public class EpisodeEntity implements Serializable {
   @Column(name = "type")
   private String type;
 
-  @ManyToOne
-  @JoinColumn(
-    name = "podcast_id",
-    nullable = false,
-    referencedColumnName = "id"
-  )
-  private PodcastEntity podcast;
+  @Column(name = "podcast_id")
+  private Long podcastId;
 }
